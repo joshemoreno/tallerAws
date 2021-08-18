@@ -1,113 +1,351 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
-service: tallerdos
-# app and org for use with dashboard.serverless.com
-#app: your-app-name
-#org: your-org-name
-
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
+service: ${self:custom.projectFullName}
 frameworkVersion: '2'
+useDotenv: true
 
 provider:
   name: aws
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
+  profile: capacitacionAws
+  stackTags:
+    Ambiente: ${self:custom.stage}
+    AreaResponsable: DevelopStefanini
+    Comentarios: " "
+    Criticidad: ALTA
+    Disponibilidad: 7x24
+    Nube: AWS
+    Plataforma: Serverless Framework
+    Proyecto: ${self:custom.project}
+    Tecnologia: Serverless
+    UnidadNegocio: Fábrica de Sofware
+  region: us-west-1
 
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
+plugins:
+  - serverless-webpack
 
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
+custom:
+  projectFullName: ${self:custom.project}
+  stage: dev
+  project: AWSTallerDos
+  integrationBaseStackName: awstraining-api-gateway-${self:custom.stage}
+  # Tables
+  tableUser: ddb-${self:custom.projectFullName}-${self:custom.stage}-UserTable
+  tableTopics: ddb-${self:custom.projectFullName}-${self:custom.stage}-TopicsTable
+  tableAssistance: ddb-${self:custom.projectFullName}-${self:custom.stage}-AssistanceTable
+  tableAuditory: ddb-${self:custom.projectFullName}-${self:custom.stage}-AuditoryTable
+  # Queues
+  queueAuditory: sqs-${self:custom.projectFullName}-${self:custom.stage}-AuditoryQueue
+  # queueUserAuditory: sqs-${self:custom.projectFullName}-${self:custom.stage}-AuditoryUserQueue
+  # queueTopicsAuditory: sqs-${self:custom.projectFullName}-${self:custom.stage}-AuditoryTopicsQueue
+  # queueAssistanceAuditory: sqs-${self:custom.projectFullName}-${self:custom.stage}-AuditoryAssistanceQueue
+  basePath: ${self:custom.projectFullName}/${self:custom.stage}
 
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
-#package:
-#  patterns:
-#    - '!exclude-me.js'
-#    - '!exclude-me-dir/**'
-#    - include-me.js
-#    - include-me-dir/**
+package:
+  individually: true
 
 functions:
-  hello:
-    handler: handler.hello
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - httpApi:
-#          path: /users/create
-#          method: get
-#      - websocket: $connect
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
-#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
-#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
-#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
-#      - iot:
-#          sql: "SELECT * FROM 'some_topic'"
-#      - cloudwatchEvent:
-#          event:
-#            source:
-#              - "aws.ec2"
-#            detail-type:
-#              - "EC2 Instance State-change Notification"
-#            detail:
-#              state:
-#                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
-#      - cognitoUserPool:
-#          pool: MyUserPool
-#          trigger: PreSignUp
-#      - alb:
-#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
-#          priority: 1
-#          conditions:
-#            host: example.com
-#            path: /hello
+  userRegister:
+    name: func-${self:custom.projectFullName}-${self:custom.stage}-userRegister
+    handler: lambda/cross/userControllerHandler.handler
+    role: userRegiterLambdaRole
+    environment:
+      QUEUE_AUDITORY:         ${self:custom.queueAuditory}
+      TABLE_USER:             ${self:custom.tableUser}
+    events:
+        - http:
+            path: ${self:custom.basePath}/userRegister
+            method: POST
+            cors: true
 
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
+  topicsRegister:
+    name: func-${self:custom.projectFullName}-${self:custom.stage}-topicsRegister
+    handler: lambda/cross/topicsControllerHandler.handler
+    role: topicsRegiterLambdaRole
+    environment:
+      QUEUE_AUDITORY:         ${self:custom.queueAuditory}
+      TABLE_TOPICS:           ${self:custom.tableTopics}
+    events:
+        - http:
+            path: ${self:custom.basePath}/topicsRegister
+            method: POST
+            cors: true
+  
+  assistanceRegister:
+    name: func-${self:custom.projectFullName}-${self:custom.stage}-assistanceRegister
+    handler: lambda/cross/assistanceControllerHandler.handler
+    role: assistanceRegiterLambdaRole
+    environment:
+      QUEUE_AUDITORY:         ${self:custom.queueAuditory}
+      TABLE_USER:             ${self:custom.tableUser}
+      TABLE_ASSISTANCE:       ${self:custom.tableAssistance}
+      TABLE_TOPICS:           ${self:custom.tableTopics}
+    events:
+        - http:
+            path: ${self:custom.basePath}/assistanceRegister
+            method: POST
+            cors: true
 
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+  auditory:
+    name: func-${self:custom.projectFullName}-${self:custom.stage}-auditory
+    handler: lambda/cross/auditoryControllerHandler.handler
+    environment:
+      TABLE_AUDITORY:      ${self:custom.tableAuditory}     
+    role: auditoryLambdaRole
+    events:
+        - sqs:
+            arn:
+              Fn::GetAtt:
+                - AuditoryQueue
+                - Arn
+
+resources:
+  Resources:
+
+    #--------------------
+    # Roles
+    # ------------------- 
+    userRegiterLambdaRole:
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - lambda.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Description: 'Lambda Role'
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        Path: /
+        Policies:
+          - PolicyName: 'send-message-sqs-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:SendMessage
+                  Resource:
+                    - Fn::GetAtt: [ AuditoryQueue, Arn ]
+          - PolicyName: 'write-dynamodb-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:PutItem
+                  Resource:
+                    - Fn::GetAtt: [ userTable, Arn ]
+        RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-userLambdaRole
+        Tags: 
+          - Key: Name
+            Value: iam-${self:custom.projectFullName}-${self:custom.stage}-userLambdaRole
+
+    topicsRegiterLambdaRole:
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - lambda.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Description: 'Lambda Role'
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        Path: /
+        Policies:
+          - PolicyName: 'send-message-sqs-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:SendMessage
+                  Resource:
+                    - Fn::GetAtt: [ AuditoryQueue, Arn ]
+          - PolicyName: 'write-dynamodb-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:PutItem
+                  Resource:
+                    - Fn::GetAtt: [ topicsTable, Arn ]
+        RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-topicsLambdaRole
+        Tags: 
+          - Key: Name
+            Value: iam-${self:custom.projectFullName}-${self:custom.stage}-topicsLambdaRole
+    
+    assistanceRegiterLambdaRole:
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - lambda.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Description: 'Lambda Role'
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        Path: /
+        Policies:
+          - PolicyName: 'send-message-sqs-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:SendMessage
+                  Resource:
+                    - Fn::GetAtt: [ AuditoryQueue, Arn ]
+          - PolicyName: 'write-dynamodb-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:PutItem
+                    - dynamodb:GetRecords
+                    - dynamodb:GetItem
+                    - dynamodb:Scan
+                    - dynamodb:Query
+                  Resource:
+                    - Fn::GetAtt: [ assistanceTable, Arn ]
+                    - Fn::GetAtt: [ topicsTable, Arn ]
+                    - Fn::GetAtt: [ userTable, Arn ]
+        RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-assistanceLambdaRole
+        Tags: 
+          - Key: Name
+            Value: iam-${self:custom.projectFullName}-${self:custom.stage}-assistanceLambdaRole
+
+    auditoryLambdaRole: 
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - lambda.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Description: 'Lambda Role'
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        Path: /
+        Policies:
+          - PolicyName: 'read-message-sqs-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:DeleteMessage
+                    - sqs:ReceiveMessage
+                    - sqs:GetQueueAttributes
+                  Resource:
+                    - Fn::GetAtt: [ AuditoryQueue, Arn ]
+          - PolicyName: 'write-dynamodb-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:PutItem
+                  Resource:
+                    - Fn::GetAtt: [ auditoryTable, Arn ]
+        RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-auditoryLambdaRole
+        Tags: 
+          - Key: Name
+            Value: iam-${self:custom.projectFullName}-${self:custom.stage}-auditoryLambdaRole
+    #--------------------
+    # Queues
+    # ------------------- 
+
+    AuditoryQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.queueAuditory}
+
+    # UserAuditoryQueue:
+    #   Type: AWS::SQS::Queue
+    #   Properties:
+    #     QueueName: ${self:custom.queueUserAuditory}
+
+    # TopicsAuditoryQueue:
+    #   Type: AWS::SQS::Queue
+    #   Properties:
+    #     QueueName: ${self:custom.queueTopicsAuditory}
+
+    # AssistanceAuditoryQueue:
+    #   Type: AWS::SQS::Queue
+    #   Properties:
+    #     QueueName: ${self:custom.queueAssistanceAuditory}
+
+    #--------------------
+    # Tales Dynamo
+    # ------------------- 
+    userTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableUser}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    topicsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableTopics}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    
+    assistanceTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableAssistance}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    auditoryTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableAuditory}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
