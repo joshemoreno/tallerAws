@@ -21,16 +21,21 @@ module.exports.handler = async (event, context) => {
     };
     util.insertLog("Objeto para DDB: ",JSON.stringify(params));
 
-    // Registro de usuarios
-    const response = await daoManager.register(context,params);
-    util.insertLog("Resultado Insert DDBB: ",JSON.stringify(response));
+    var statusUser = await daoManager.searchById(context,tableUser,'id',data.id);
+    if (statusUser!=null){
+      return util.cargaClientResponse(202,"Solicitud rechazada: El usuario ya existe." , data);  
+    }else{
+      // Registro de usuarios
+      const response = await daoManager.register(context,params);
+      util.insertLog("Resultado Insert DDBB: ",JSON.stringify(response));
 
-    // Registro de auditoria
-    var infoAuditory = new auditoryDto(msgId,"Init", infoRequest, {});
-    var resultAudit = await sqsManager.sendMessage(context, infoAuditory, sqsAuditory);
-    util.insertLog("Result envío SQS Auditoria: " + JSON.stringify(resultAudit));
+      // Registro de auditoria
+      var infoAuditory = new auditoryDto(msgId,"Init", infoRequest, {});
+      var resultAudit = await sqsManager.sendMessage(context, infoAuditory, sqsAuditory);
+      util.insertLog("Result envío SQS Auditoria: " + JSON.stringify(resultAudit));
 
-    return util.cargaClientResponse(200,"Solicitud recibida", data);
+      return util.cargaClientResponse(200,"Solicitud recibida", data);
+    }
   } catch (error) {
     util.insertLog("Error en userControllerHandler: " + error);
     var infoAuditory = new auditoryDto(msgId, 500, "Error en userControllerHandler" );

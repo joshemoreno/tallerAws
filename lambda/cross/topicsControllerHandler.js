@@ -33,20 +33,25 @@ module.exports.handler = async (event, context) => {
     };
     util.insertLog("Objeto para DDB: ",JSON.stringify(params));
 
-    if (scheduling > currentDate){
-      // Registro de tema
-      const response = await daoManager.register(context,params);
-      util.insertLog("Resultado Insert DDBB: ",JSON.stringify(response));
-
-      // Registro de auditoria
-      var infoAuditory = new auditoryDto(msgId,"Init", data, {});
-      var resultAudit = await sqsManager.sendMessage(context, infoAuditory, sqsAuditory);
-      util.insertLog("Result envío SQS Auditoria: " + JSON.stringify(resultAudit));
-
+    var statusTopic = await daoManager.searchById(context,tableTopics,'id',data.id);
+    if (statusTopic!=null){
+      return util.cargaClientResponse(202,"Solicitud rechazada: El tema ya existe." , data);
     }else{
-      return util.cargaClientResponse(400,"Invalid schedulingDate!",data);
+      if (scheduling > currentDate){
+        // Registro de tema
+        const response = await daoManager.register(context,params);
+        util.insertLog("Resultado Insert DDBB: ",JSON.stringify(response));
+  
+        // Registro de auditoria
+        var infoAuditory = new auditoryDto(msgId,"Init", data, {});
+        var resultAudit = await sqsManager.sendMessage(context, infoAuditory, sqsAuditory);
+        util.insertLog("Result envío SQS Auditoria: " + JSON.stringify(resultAudit));
+  
+      }else{
+        return util.cargaClientResponse(400,"Invalid schedulingDate!",data);
+      }
+      return util.cargaClientResponse(200,"Solicitud recibida", data);
     }
-    return util.cargaClientResponse(200,"Solicitud recibida", data);
 
   } catch (error) {
     util.insertLog("Error en userControllerHandler: " + error);

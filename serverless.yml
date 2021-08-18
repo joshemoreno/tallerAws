@@ -138,6 +138,10 @@ resources:
                 - Effect: Allow
                   Action:
                     - dynamodb:PutItem
+                    - dynamodb:GetRecords
+                    - dynamodb:GetItem
+                    - dynamodb:Scan
+                    - dynamodb:Query
                   Resource:
                     - Fn::GetAtt: [ userTable, Arn ]
         RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-userLambdaRole
@@ -179,6 +183,10 @@ resources:
                 - Effect: Allow
                   Action:
                     - dynamodb:PutItem
+                    - dynamodb:GetRecords
+                    - dynamodb:GetItem
+                    - dynamodb:Scan
+                    - dynamodb:Query
                   Resource:
                     - Fn::GetAtt: [ topicsTable, Arn ]
         RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-topicsLambdaRole

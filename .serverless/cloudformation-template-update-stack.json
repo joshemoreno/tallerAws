@@ -102,7 +102,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/AWSTallerDos/dev/1629252821080-2021-08-18T02:13:41.080Z/userRegister.zip"
+          "S3Key": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z/userRegister.zip"
         },
         "Handler": "lambda/cross/userControllerHandler.handler",
         "Runtime": "nodejs12.x",
@@ -134,7 +134,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/AWSTallerDos/dev/1629252821080-2021-08-18T02:13:41.080Z/topicsRegister.zip"
+          "S3Key": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z/topicsRegister.zip"
         },
         "Handler": "lambda/cross/topicsControllerHandler.handler",
         "Runtime": "nodejs12.x",
@@ -166,7 +166,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/AWSTallerDos/dev/1629252821080-2021-08-18T02:13:41.080Z/assistanceRegister.zip"
+          "S3Key": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z/assistanceRegister.zip"
         },
         "Handler": "lambda/cross/assistanceControllerHandler.handler",
         "Runtime": "nodejs12.x",
@@ -200,7 +200,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/AWSTallerDos/dev/1629252821080-2021-08-18T02:13:41.080Z/auditory.zip"
+          "S3Key": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z/auditory.zip"
         },
         "Handler": "lambda/cross/auditoryControllerHandler.handler",
         "Runtime": "nodejs12.x",
@@ -224,44 +224,44 @@
         "auditoryLambdaRole"
       ]
     },
-    "UserRegisterLambdaVersionXzSiGN2N8MGgvhFSy4eNP9el5GJ46waJcap8Se9Rd8": {
+    "UserRegisterLambdaVersionyLAlWhQCIEO0sgHEi3QzWOlmxzxeC9xH3UiPYIVQ34A": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "UserRegisterLambdaFunction"
         },
-        "CodeSha256": "8eyBBuJVLuG1jih1S2ByeW04wkdm3HgMVZHHpK7gpYM="
+        "CodeSha256": "HRmkGH/OFuAChfEe9NdkGCzKSV55TpAs6o0Ydhe/N20="
       }
     },
-    "TopicsRegisterLambdaVersionDvD0mQDG4X2w0GHRauOqZ8UXkRkm00C1PluIvweA": {
+    "TopicsRegisterLambdaVersionZMXbzqKoMlP8A3fZZQPdRIIwLaXcw2tT99kXYlxSNas": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "TopicsRegisterLambdaFunction"
         },
-        "CodeSha256": "1Te0D5wlUKHYEptUdhytKSg24Kf9z3YlU3ZUZzstKJU="
+        "CodeSha256": "AuoS4hFOlKkgTGQBb9S0B15Pa53w0zi4G0j6udvovQ8="
       }
     },
-    "AssistanceRegisterLambdaVersionSdhhHNTHlSkr2vIf80X7DxxuUWAw9amWRaW3LO8NM": {
+    "AssistanceRegisterLambdaVersionwO8Ob75b3E8j1ZtjpsDWaSO73hCCNAJyEPV1ZD9RNE": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AssistanceRegisterLambdaFunction"
         },
-        "CodeSha256": "+m1NeaahelVVVY5Frkoo4XWRiknf28CVRmC/f+bh85o="
+        "CodeSha256": "haPfuZeCtsws57bW3hcszU7zGtw9zSeeVJ89xlPsHpY="
       }
     },
-    "AuditoryLambdaVersion8VQQqMsxuXte52fVHVhQhCE9F0NusK6GH74hqDBd2k": {
+    "AuditoryLambdaVersionoczqZxhlDIJh3zx3rjSN9ZNg47bITaIr0HupJcaJvHM": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AuditoryLambdaFunction"
         },
-        "CodeSha256": "MS2LqrHXESL/hoL+WF/EXrRKHTdhXcDujgzOBRFlpuc="
+        "CodeSha256": "yHNCQ9vBPpEHmtXLpy9VRNdcgMAcR4RreHgsJ9KZ1hI="
       }
     },
     "ApiGatewayRestApi": {
@@ -612,7 +612,7 @@
         "AssistanceRegisterLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1629252805458": {
+    "ApiGatewayDeployment1629295305175": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -818,7 +818,11 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "dynamodb:PutItem"
+                    "dynamodb:PutItem",
+                    "dynamodb:GetRecords",
+                    "dynamodb:GetItem",
+                    "dynamodb:Scan",
+                    "dynamodb:Query"
                   ],
                   "Resource": [
                     {
@@ -898,7 +902,11 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "dynamodb:PutItem"
+                    "dynamodb:PutItem",
+                    "dynamodb:GetRecords",
+                    "dynamodb:GetItem",
+                    "dynamodb:Scan",
+                    "dynamodb:Query"
                   ],
                   "Resource": [
                     {
@@ -1195,7 +1203,7 @@
     "UserRegisterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "UserRegisterLambdaVersionXzSiGN2N8MGgvhFSy4eNP9el5GJ46waJcap8Se9Rd8"
+        "Ref": "UserRegisterLambdaVersionyLAlWhQCIEO0sgHEi3QzWOlmxzxeC9xH3UiPYIVQ34A"
       },
       "Export": {
         "Name": "sls-AWSTallerDos-dev-UserRegisterLambdaFunctionQualifiedArn"
@@ -1204,7 +1212,7 @@
     "TopicsRegisterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "TopicsRegisterLambdaVersionDvD0mQDG4X2w0GHRauOqZ8UXkRkm00C1PluIvweA"
+        "Ref": "TopicsRegisterLambdaVersionZMXbzqKoMlP8A3fZZQPdRIIwLaXcw2tT99kXYlxSNas"
       },
       "Export": {
         "Name": "sls-AWSTallerDos-dev-TopicsRegisterLambdaFunctionQualifiedArn"
@@ -1213,7 +1221,7 @@
     "AssistanceRegisterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AssistanceRegisterLambdaVersionSdhhHNTHlSkr2vIf80X7DxxuUWAw9amWRaW3LO8NM"
+        "Ref": "AssistanceRegisterLambdaVersionwO8Ob75b3E8j1ZtjpsDWaSO73hCCNAJyEPV1ZD9RNE"
       },
       "Export": {
         "Name": "sls-AWSTallerDos-dev-AssistanceRegisterLambdaFunctionQualifiedArn"
@@ -1222,7 +1230,7 @@
     "AuditoryLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AuditoryLambdaVersion8VQQqMsxuXte52fVHVhQhCE9F0NusK6GH74hqDBd2k"
+        "Ref": "AuditoryLambdaVersionoczqZxhlDIJh3zx3rjSN9ZNg47bITaIr0HupJcaJvHM"
       },
       "Export": {
         "Name": "sls-AWSTallerDos-dev-AuditoryLambdaFunctionQualifiedArn"

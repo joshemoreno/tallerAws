@@ -37,7 +37,7 @@ module.exports.register = async (context, params) => {
         try{
             await documentClient.get(paramsGet, function(error, data) {
                 if (error) {
-                    mensajeText=false
+                    mensajeText=null
                 } else {
                     mensajeText=data.Item;               
                 }
