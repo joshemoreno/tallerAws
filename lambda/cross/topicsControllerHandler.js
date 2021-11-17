@@ -12,9 +12,9 @@ module.exports.handler = async (event, context) => {
   var currentDay = new Date().getDate();
   var currentMonth = new Date().getMonth();
   var currentYear = new Date().getFullYear();
-  var day = parseInt(data.schedulingDate.split('/')[0]);
-  var month = parseInt(data.schedulingDate.split('/')[1])-1;
-  var year= parseInt(data.schedulingDate.split('/')[2]);
+  var day = parseInt(data.schedulingDate.split('-')[2]);
+  var month = parseInt(data.schedulingDate.split('-')[1])-1;
+  var year= parseInt(data.schedulingDate.split('-')[0]);
 
   var scheduling = new Date(year,month,day);
   var currentDate = new Date(currentYear,currentMonth,currentDay);
@@ -25,7 +25,7 @@ module.exports.handler = async (event, context) => {
       return util.cargaClientResponse(400,"Invalid Request!", data);
     };
     data.id=data.name+"-"+data.schedulingDate;
-    data.status="Programado";
+    data.topicStatus="Programado";
 
     var params = {
       TableName: tableTopics,
@@ -42,15 +42,14 @@ module.exports.handler = async (event, context) => {
         const response = await daoManager.register(context,params);
         util.insertLog("Resultado Insert DDBB: ",JSON.stringify(response));
   
-        // Registro de auditoria
+       // Registro de auditoria
         var infoAuditory = new auditoryDto(msgId,"Init", data, {});
         var resultAudit = await sqsManager.sendMessage(context, infoAuditory, sqsAuditory);
         util.insertLog("Result envío SQS Auditoria: " + JSON.stringify(resultAudit));
-  
+        return util.cargaClientResponse(200,"Solicitud recibida", data);
       }else{
-        return util.cargaClientResponse(400,"Invalid schedulingDate!",data);
+        return util.cargaClientResponse(202,"Solicitud rechazada: La fecha debe ser mayor al dia de hoy." , data);
       }
-      return util.cargaClientResponse(200,"Solicitud recibida", data);
     }
 
   } catch (error) {

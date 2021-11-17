@@ -33,6 +33,9 @@ custom:
   tableTopics: ddb-${self:custom.projectFullName}-${self:custom.stage}-TopicsTable
   tableAssistance: ddb-${self:custom.projectFullName}-${self:custom.stage}-AssistanceTable
   tableAuditory: ddb-${self:custom.projectFullName}-${self:custom.stage}-AuditoryTable
+  tableParams: ddb-${self:custom.projectFullName}-${self:custom.stage}-ParamsTable
+  # userPool: Cog-${self:custom.projectFullName}-${self:custom.stage}-userPool
+  # userPoolClient: Cog-${self:custom.projectFullName}-${self:custom.stage}-userPoolClient
   # Queues
   queueAuditory: sqs-${self:custom.projectFullName}-${self:custom.stage}-AuditoryQueue
   # queueUserAuditory: sqs-${self:custom.projectFullName}-${self:custom.stage}-AuditoryUserQueue
@@ -98,8 +101,77 @@ functions:
                 - AuditoryQueue
                 - Arn
 
+  worker:
+    name: func-${self:custom.projectFullName}-${self:custom.stage}-worker
+    handler: lambda/cross/workerControllerHandler.handler
+    environment:
+      TABLE_TOPICS:           ${self:custom.tableTopics}
+      TABLE_AUDITORY:         ${self:custom.tableAuditory}
+      REGION_DB:              ${self:provider.region}     
+    role: workerLambdaRole
+    events:
+        - http:
+            path: ${self:custom.basePath}/worker
+            method: GET
+            cors: true
+      # - schedule:
+      #   rate: cron(0 24 ? * MON-FRI *)
+
+  getTopic:
+    name: func-${self:custom.projectFullName}-${self:custom.stage}-getTopic
+    handler: lambda/cross/getTopicsControllerHandler.handler
+    environment:
+      TABLE_TOPICS:           ${self:custom.tableTopics}
+      # TABLE_AUDITORY:         ${self:custom.tableAuditory}
+      REGION_DB:              ${self:provider.region}     
+    role: getTopicLambdaRole
+    events:
+        - http:
+            path: ${self:custom.basePath}/getTopic
+            method: GET
+            authorizer: auth
+            cors: true
+
+
+  getParams:
+    name: func-${self:custom.projectFullName}-${self:custom.stage}-getParams
+    handler: lambda/cross/getParamsControllerHandler.handler
+    environment:
+      TABLE_PARAMS:           ${self:custom.tableParams}
+      # TABLE_AUDITORY:         ${self:custom.tableAuditory}
+      REGION_DB:              ${self:provider.region}     
+    role: getParamsLambdaRole
+    events:
+        - http:
+            path: ${self:custom.basePath}/getParams
+            method: GET
+            cors: true
+            
+
+  auth:
+    name: func-${self:custom.projectFullName}-${self:custom.stage}-auth
+    handler: lambda/authorizer/AuthHandler.auth
+
 resources:
   Resources:
+
+    # ApiGateWay:
+    #   Type: AWS::ApiGateway::Api
+    #   Properties:
+    #     StageName: ${self:custom.stage}
+    #     Auth:
+    #       DefaultAuthorizer: LambdaTokenAuthorizer
+    #       Authorizers:
+    #         LambdaTokenAuthorizer:
+    #           Resource:
+    #                 - Fn::GetAtt: [ AuthFuntion, Arn ]
+
+    # AuthFuntion:
+    #   Type: 'AWS::ApiGateway::Function'
+    #   Properties:
+    #     CodeUri: ./authorizer
+    #     Handler: handler.authorizer
+    #     Runtime: nodejs12.x
 
     #--------------------
     # Roles
@@ -283,6 +355,129 @@ resources:
         Tags: 
           - Key: Name
             Value: iam-${self:custom.projectFullName}-${self:custom.stage}-auditoryLambdaRole
+    
+    workerLambdaRole:
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - lambda.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Description: 'Lambda Role'
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        Path: /
+        Policies:
+          - PolicyName: 'send-message-sqs-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:SendMessage
+                  Resource:
+                    - Fn::GetAtt: [ AuditoryQueue, Arn ]
+          - PolicyName: 'write-dynamodb-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:PutItem
+                    - dynamodb:GetRecords
+                    - dynamodb:GetItem
+                    - dynamodb:Scan
+                    - dynamodb:Query
+                    - dynamodb:PartiQLSelect
+                    - dynamodb:UpdateItem
+                  Resource:
+                    - Fn::GetAtt: [ topicsTable, Arn ]
+        RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-workerLambdaRole
+        Tags: 
+          - Key: Name
+            Value: iam-${self:custom.projectFullName}-${self:custom.stage}-workerLambdaRole
+
+    getTopicLambdaRole:
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - lambda.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Description: 'Lambda Role'
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        Path: /
+        Policies:
+          - PolicyName: 'read-dynamodb-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    # - dynamodb:PutItem
+                    - dynamodb:GetRecords
+                    - dynamodb:GetItem
+                    - dynamodb:Scan
+                    - dynamodb:Query
+                    - dynamodb:PartiQLSelect
+                  Resource:
+                    - Fn::GetAtt: [ topicsTable, Arn ]
+        RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-getTopicLambdaRole
+        Tags: 
+          - Key: Name
+            Value: iam-${self:custom.projectFullName}-${self:custom.stage}-getTopicLambdaRole
+
+    getParamsLambdaRole:
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - lambda.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Description: 'Lambda Role'
+        ManagedPolicyArns: 
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        Path: /
+        Policies:
+          - PolicyName: 'read-dynamodb-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    # - dynamodb:PutItem
+                    - dynamodb:GetRecords
+                    - dynamodb:GetItem
+                    - dynamodb:Scan
+                    - dynamodb:Query
+                    - dynamodb:PartiQLSelect
+                  Resource:
+                    - Fn::GetAtt: [ topicsTable, Arn ]
+                    - Fn::GetAtt: [ paramsTable, Arn ]
+        RoleName: iam-${self:custom.projectFullName}-${self:custom.stage}-getParamsLambdaRole
+        Tags: 
+          - Key: Name
+            Value: iam-${self:custom.projectFullName}-${self:custom.stage}-getParamsLambdaRole
+    
     #--------------------
     # Queues
     # ------------------- 
@@ -357,3 +552,36 @@ resources:
           - AttributeName: id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+
+    paramsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableParams}
+        AttributeDefinitions:
+          - AttributeName: typeParam
+            AttributeType: S
+        KeySchema:
+          - AttributeName: typeParam
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        
+# -------        
+# cognito
+# ------- 
+    # CognitoUserPool:
+    #   Type: AWS::Cognito::UserPool
+    #   Properties:
+    #     UserPoolName: ${self:custom.userPool}
+    #     UsernameAttributes:
+    #       - email
+    #     AutoVerifiedAttributes:
+    #       - email
+    # CognitoUserPoolClient:
+    #   Type: AWS::Cognito::UserPoolClient
+    #   Properties:
+    #     ClientName: ${self:custom.userPoolClient}
+    #     UserPoolId:
+    #       Ref: CognitoUserPool
+    #     ExplicitAuthFlows:
+    #       - ADMIN_NO_SRP_AUTH
+    #     GenerateSecret: false

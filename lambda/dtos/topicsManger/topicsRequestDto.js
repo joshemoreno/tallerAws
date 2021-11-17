@@ -6,7 +6,7 @@ class topicsRequestDto {
     this.name = name;
     this.schedulingDate = schedulingDate;
     this.responsibleName = responsibleName;
-    this.status = "";
+    this.topicStatus = "";
   }
 
   isLoad(info){

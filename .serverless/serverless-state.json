@@ -121,6 +121,165 @@
               "LogGroupName": "/aws/lambda/func-AWSTallerDos-dev-auditory"
             }
           },
+          "WorkerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/func-AWSTallerDos-dev-worker"
+            }
+          },
+          "GetTopicLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/func-AWSTallerDos-dev-getTopic"
+            }
+          },
+          "GetParamsLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/func-AWSTallerDos-dev-getParams"
+            }
+          },
+          "AuthLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/func-AWSTallerDos-dev-auth"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "AWSTallerDos",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-userRegister:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-topicsRegister:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-assistanceRegister:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-auditory:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-worker:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-getTopic:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-getParams:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-auth:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-userRegister:*:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-topicsRegister:*:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-assistanceRegister:*:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-auditory:*:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-worker:*:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-getTopic:*:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-getParams:*:*"
+                          },
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/func-AWSTallerDos-dev-auth:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "sqs:ReceiveMessage",
+                          "sqs:DeleteMessage",
+                          "sqs:GetQueueAttributes"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::GetAtt": [
+                              "AuditoryQueue",
+                              "Arn"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "AWSTallerDos",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
           "UserRegisterLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
@@ -128,7 +287,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z/userRegister.zip"
+                "S3Key": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z/userRegister.zip"
               },
               "Handler": "lambda/cross/userControllerHandler.handler",
               "Runtime": "nodejs12.x",
@@ -160,7 +319,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z/topicsRegister.zip"
+                "S3Key": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z/topicsRegister.zip"
               },
               "Handler": "lambda/cross/topicsControllerHandler.handler",
               "Runtime": "nodejs12.x",
@@ -192,7 +351,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z/assistanceRegister.zip"
+                "S3Key": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z/assistanceRegister.zip"
               },
               "Handler": "lambda/cross/assistanceControllerHandler.handler",
               "Runtime": "nodejs12.x",
@@ -226,7 +385,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z/auditory.zip"
+                "S3Key": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z/auditory.zip"
               },
               "Handler": "lambda/cross/auditoryControllerHandler.handler",
               "Runtime": "nodejs12.x",
@@ -250,44 +409,206 @@
               "auditoryLambdaRole"
             ]
           },
-          "UserRegisterLambdaVersionyLAlWhQCIEO0sgHEi3QzWOlmxzxeC9xH3UiPYIVQ34A": {
+          "WorkerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z/worker.zip"
+              },
+              "Handler": "lambda/cross/workerControllerHandler.handler",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "func-AWSTallerDos-dev-worker",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_TOPICS": "ddb-AWSTallerDos-dev-TopicsTable",
+                  "TABLE_AUDITORY": "ddb-AWSTallerDos-dev-AuditoryTable",
+                  "REGION_DB": "us-west-1"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "workerLambdaRole",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "WorkerLogGroup",
+              "workerLambdaRole"
+            ]
+          },
+          "GetTopicLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z/getTopic.zip"
+              },
+              "Handler": "lambda/cross/getTopicsControllerHandler.handler",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "func-AWSTallerDos-dev-getTopic",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_TOPICS": "ddb-AWSTallerDos-dev-TopicsTable",
+                  "REGION_DB": "us-west-1"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "getTopicLambdaRole",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "GetTopicLogGroup",
+              "getTopicLambdaRole"
+            ]
+          },
+          "GetParamsLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z/getParams.zip"
+              },
+              "Handler": "lambda/cross/getParamsControllerHandler.handler",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "func-AWSTallerDos-dev-getParams",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_PARAMS": "ddb-AWSTallerDos-dev-ParamsTable",
+                  "REGION_DB": "us-west-1"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "getParamsLambdaRole",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "GetParamsLogGroup",
+              "getParamsLambdaRole"
+            ]
+          },
+          "AuthLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z/auth.zip"
+              },
+              "Handler": "lambda/authorizer/AuthHandler.auth",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "func-AWSTallerDos-dev-auth",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "AuthLogGroup"
+            ]
+          },
+          "AuthLambdaVersionUVGIdJEI3N5RaJSPFseH1hv5O5nAu7DgcY1s8iHI": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "AuthLambdaFunction"
+              },
+              "CodeSha256": "AjjgvyKpvp8MqWtPQERcIFW711lZzvtubEwNYIAZGEY="
+            }
+          },
+          "UserRegisterLambdaVersiongm0aYjEk8NmYJ1o0wOJv7MiKVsLzWHGJMNadAcbnNDE": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "UserRegisterLambdaFunction"
               },
-              "CodeSha256": "HRmkGH/OFuAChfEe9NdkGCzKSV55TpAs6o0Ydhe/N20="
+              "CodeSha256": "2aiZElmREP0ygWdnpYdnfZJZdQdxxksM1upESEhXEoc="
             }
           },
-          "TopicsRegisterLambdaVersionZMXbzqKoMlP8A3fZZQPdRIIwLaXcw2tT99kXYlxSNas": {
+          "TopicsRegisterLambdaVersionBHeGHdpfIsneXCApTh84Lp0zWDWGhzHLW0q1FwRk8": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "TopicsRegisterLambdaFunction"
               },
-              "CodeSha256": "AuoS4hFOlKkgTGQBb9S0B15Pa53w0zi4G0j6udvovQ8="
+              "CodeSha256": "OqZheQW4WW4W1W86K/xuiI9pFw0c69vzha1cOBZUWEc="
             }
           },
-          "AssistanceRegisterLambdaVersionwO8Ob75b3E8j1ZtjpsDWaSO73hCCNAJyEPV1ZD9RNE": {
+          "AssistanceRegisterLambdaVersionDv8fGb5OIY4fsGoC0KeKKoDZ3IXgIXsdL2sIN1XlA": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AssistanceRegisterLambdaFunction"
               },
-              "CodeSha256": "haPfuZeCtsws57bW3hcszU7zGtw9zSeeVJ89xlPsHpY="
+              "CodeSha256": "IJbuFU/zNzZwebbGQwwLgyKlHRI218Lztl4QthPWvDY="
             }
           },
-          "AuditoryLambdaVersionoczqZxhlDIJh3zx3rjSN9ZNg47bITaIr0HupJcaJvHM": {
+          "AuditoryLambdaVersionZPbsV5Z2tgR4U9alCHwwbuovnJeOmOiKXAQja2kg83w": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AuditoryLambdaFunction"
               },
-              "CodeSha256": "yHNCQ9vBPpEHmtXLpy9VRNdcgMAcR4RreHgsJ9KZ1hI="
+              "CodeSha256": "PQEhn3Ed3KAfgheCwYLuEJcT0ppfOX/jJ2GOQLTVE3s="
+            }
+          },
+          "WorkerLambdaVersionJOVcvqaZD3nju5A1FRumXoM9oLg1CQmdImFbgpFqSWc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WorkerLambdaFunction"
+              },
+              "CodeSha256": "7xemQAFH9K83QSibn9mD955vDmiGw+s0hSmO2UpJzyE="
+            }
+          },
+          "GetTopicLambdaVersionIuEJMQWqe5e97zwMpAuMgVb0996i775yRLwYY98": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetTopicLambdaFunction"
+              },
+              "CodeSha256": "MWb7hWABJ/SIT6JFfb70VaLgh1QdCBsXRpsG2hWMuoM="
+            }
+          },
+          "GetParamsLambdaVersion8IDZ264j7FQszEBDiUJZfjiAK2RbESi8GD6EaysdJA": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetParamsLambdaFunction"
+              },
+              "CodeSha256": "x4DGopisBZJEZZoQ9Sz8ZUuy+w/NZmQKQaZJ/UzUJx0="
             }
           },
           "ApiGatewayRestApi": {
@@ -360,6 +681,42 @@
                 "Ref": "ApiGatewayResourceAwstallerdosDev"
               },
               "PathPart": "assistanceRegister",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceAwstallerdosDevWorker": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDev"
+              },
+              "PathPart": "worker",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceAwstallerdosDevGettopic": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDev"
+              },
+              "PathPart": "getTopic",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceAwstallerdosDevGetparams": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDev"
+              },
+              "PathPart": "getParams",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -494,6 +851,141 @@
               },
               "ResourceId": {
                 "Ref": "ApiGatewayResourceAwstallerdosDevAssistanceregister"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodAwstallerdosDevWorkerOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDevWorker"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodAwstallerdosDevGettopicOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDevGettopic"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodAwstallerdosDevGetparamsOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDevGetparams"
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
@@ -638,7 +1130,180 @@
               "AssistanceRegisterLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1629295305175": {
+          "ApiGatewayMethodAwstallerdosDevWorkerGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDevWorker"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "WorkerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "WorkerLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodAwstallerdosDevGettopicGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDevGettopic"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "CUSTOM",
+              "AuthorizerId": {
+                "Ref": "AuthApiGatewayAuthorizer"
+              },
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "GetTopicLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": "AuthApiGatewayAuthorizer"
+          },
+          "ApiGatewayMethodAwstallerdosDevGetparamsGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceAwstallerdosDevGetparams"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "GetParamsLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "GetParamsLambdaPermissionApiGateway"
+            ]
+          },
+          "AuthApiGatewayAuthorizer": {
+            "Type": "AWS::ApiGateway::Authorizer",
+            "Properties": {
+              "IdentitySource": "method.request.header.Authorization",
+              "Name": "auth",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "AuthorizerUri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "AuthLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              },
+              "Type": "TOKEN"
+            }
+          },
+          "ApiGatewayDeployment1637190960283": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -650,9 +1315,15 @@
               "ApiGatewayMethodAwstallerdosDevUserregisterOptions",
               "ApiGatewayMethodAwstallerdosDevTopicsregisterOptions",
               "ApiGatewayMethodAwstallerdosDevAssistanceregisterOptions",
+              "ApiGatewayMethodAwstallerdosDevWorkerOptions",
+              "ApiGatewayMethodAwstallerdosDevGettopicOptions",
+              "ApiGatewayMethodAwstallerdosDevGetparamsOptions",
               "ApiGatewayMethodAwstallerdosDevUserregisterPost",
               "ApiGatewayMethodAwstallerdosDevTopicsregisterPost",
-              "ApiGatewayMethodAwstallerdosDevAssistanceregisterPost"
+              "ApiGatewayMethodAwstallerdosDevAssistanceregisterPost",
+              "ApiGatewayMethodAwstallerdosDevWorkerGet",
+              "ApiGatewayMethodAwstallerdosDevGettopicGet",
+              "ApiGatewayMethodAwstallerdosDevGetparamsGet"
             ]
           },
           "UserRegisterLambdaPermissionApiGateway": {
@@ -735,6 +1406,154 @@
               "FunctionName": {
                 "Fn::GetAtt": [
                   "AssistanceRegisterLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "WorkerLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "WorkerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "GetTopicLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetTopicLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "AuthLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "AuthLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "GetParamsLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetParamsLambdaFunction",
                   "Arn"
                 ]
               },
@@ -1134,6 +1953,222 @@
               ]
             }
           },
+          "workerLambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Description": "Lambda Role",
+              "ManagedPolicyArns": [
+                "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+              ],
+              "Path": "/",
+              "Policies": [
+                {
+                  "PolicyName": "send-message-sqs-policy",
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "sqs:SendMessage"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::GetAtt": [
+                              "AuditoryQueue",
+                              "Arn"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "PolicyName": "write-dynamodb-policy",
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "dynamodb:PutItem",
+                          "dynamodb:GetRecords",
+                          "dynamodb:GetItem",
+                          "dynamodb:Scan",
+                          "dynamodb:Query",
+                          "dynamodb:PartiQLSelect",
+                          "dynamodb:UpdateItem"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::GetAtt": [
+                              "topicsTable",
+                              "Arn"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "RoleName": "iam-AWSTallerDos-dev-workerLambdaRole",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "iam-AWSTallerDos-dev-workerLambdaRole"
+                }
+              ]
+            }
+          },
+          "getTopicLambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Description": "Lambda Role",
+              "ManagedPolicyArns": [
+                "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+              ],
+              "Path": "/",
+              "Policies": [
+                {
+                  "PolicyName": "read-dynamodb-policy",
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "dynamodb:GetRecords",
+                          "dynamodb:GetItem",
+                          "dynamodb:Scan",
+                          "dynamodb:Query",
+                          "dynamodb:PartiQLSelect"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::GetAtt": [
+                              "topicsTable",
+                              "Arn"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "RoleName": "iam-AWSTallerDos-dev-getTopicLambdaRole",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "iam-AWSTallerDos-dev-getTopicLambdaRole"
+                }
+              ]
+            }
+          },
+          "getParamsLambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Description": "Lambda Role",
+              "ManagedPolicyArns": [
+                "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+              ],
+              "Path": "/",
+              "Policies": [
+                {
+                  "PolicyName": "read-dynamodb-policy",
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "dynamodb:GetRecords",
+                          "dynamodb:GetItem",
+                          "dynamodb:Scan",
+                          "dynamodb:Query",
+                          "dynamodb:PartiQLSelect"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::GetAtt": [
+                              "topicsTable",
+                              "Arn"
+                            ]
+                          },
+                          {
+                            "Fn::GetAtt": [
+                              "paramsTable",
+                              "Arn"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "RoleName": "iam-AWSTallerDos-dev-getParamsLambdaRole",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "iam-AWSTallerDos-dev-getParamsLambdaRole"
+                }
+              ]
+            }
+          },
           "AuditoryQueue": {
             "Type": "AWS::SQS::Queue",
             "Properties": {
@@ -1215,6 +2250,25 @@
               ],
               "BillingMode": "PAY_PER_REQUEST"
             }
+          },
+          "paramsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "ddb-AWSTallerDos-dev-ParamsTable",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "typeParam",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "typeParam",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
           }
         },
         "Outputs": {
@@ -1226,10 +2280,19 @@
               "Name": "sls-AWSTallerDos-dev-ServerlessDeploymentBucketName"
             }
           },
+          "AuthLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "AuthLambdaVersionUVGIdJEI3N5RaJSPFseH1hv5O5nAu7DgcY1s8iHI"
+            },
+            "Export": {
+              "Name": "sls-AWSTallerDos-dev-AuthLambdaFunctionQualifiedArn"
+            }
+          },
           "UserRegisterLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "UserRegisterLambdaVersionyLAlWhQCIEO0sgHEi3QzWOlmxzxeC9xH3UiPYIVQ34A"
+              "Ref": "UserRegisterLambdaVersiongm0aYjEk8NmYJ1o0wOJv7MiKVsLzWHGJMNadAcbnNDE"
             },
             "Export": {
               "Name": "sls-AWSTallerDos-dev-UserRegisterLambdaFunctionQualifiedArn"
@@ -1238,7 +2301,7 @@
           "TopicsRegisterLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "TopicsRegisterLambdaVersionZMXbzqKoMlP8A3fZZQPdRIIwLaXcw2tT99kXYlxSNas"
+              "Ref": "TopicsRegisterLambdaVersionBHeGHdpfIsneXCApTh84Lp0zWDWGhzHLW0q1FwRk8"
             },
             "Export": {
               "Name": "sls-AWSTallerDos-dev-TopicsRegisterLambdaFunctionQualifiedArn"
@@ -1247,7 +2310,7 @@
           "AssistanceRegisterLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AssistanceRegisterLambdaVersionwO8Ob75b3E8j1ZtjpsDWaSO73hCCNAJyEPV1ZD9RNE"
+              "Ref": "AssistanceRegisterLambdaVersionDv8fGb5OIY4fsGoC0KeKKoDZ3IXgIXsdL2sIN1XlA"
             },
             "Export": {
               "Name": "sls-AWSTallerDos-dev-AssistanceRegisterLambdaFunctionQualifiedArn"
@@ -1256,10 +2319,37 @@
           "AuditoryLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AuditoryLambdaVersionoczqZxhlDIJh3zx3rjSN9ZNg47bITaIr0HupJcaJvHM"
+              "Ref": "AuditoryLambdaVersionZPbsV5Z2tgR4U9alCHwwbuovnJeOmOiKXAQja2kg83w"
             },
             "Export": {
               "Name": "sls-AWSTallerDos-dev-AuditoryLambdaFunctionQualifiedArn"
+            }
+          },
+          "WorkerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WorkerLambdaVersionJOVcvqaZD3nju5A1FRumXoM9oLg1CQmdImFbgpFqSWc"
+            },
+            "Export": {
+              "Name": "sls-AWSTallerDos-dev-WorkerLambdaFunctionQualifiedArn"
+            }
+          },
+          "GetTopicLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetTopicLambdaVersionIuEJMQWqe5e97zwMpAuMgVb0996i775yRLwYY98"
+            },
+            "Export": {
+              "Name": "sls-AWSTallerDos-dev-GetTopicLambdaFunctionQualifiedArn"
+            }
+          },
+          "GetParamsLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetParamsLambdaVersion8IDZ264j7FQszEBDiUJZfjiAK2RbESi8GD6EaysdJA"
+            },
+            "Export": {
+              "Name": "sls-AWSTallerDos-dev-GetParamsLambdaFunctionQualifiedArn"
             }
           },
           "ServiceEndpoint": {
@@ -1383,6 +2473,7 @@
       "tableTopics": "ddb-AWSTallerDos-dev-TopicsTable",
       "tableAssistance": "ddb-AWSTallerDos-dev-AssistanceTable",
       "tableAuditory": "ddb-AWSTallerDos-dev-AuditoryTable",
+      "tableParams": "ddb-AWSTallerDos-dev-ParamsTable",
       "queueAuditory": "sqs-AWSTallerDos-dev-AuditoryQueue",
       "basePath": "AWSTallerDos/dev"
     },
@@ -1434,7 +2525,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "UserRegisterLambdaVersionyLAlWhQCIEO0sgHEi3QzWOlmxzxeC9xH3UiPYIVQ34A"
+        "versionLogicalId": "UserRegisterLambdaVersiongm0aYjEk8NmYJ1o0wOJv7MiKVsLzWHGJMNadAcbnNDE"
       },
       "topicsRegister": {
         "name": "func-AWSTallerDos-dev-topicsRegister",
@@ -1479,7 +2570,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "TopicsRegisterLambdaVersionZMXbzqKoMlP8A3fZZQPdRIIwLaXcw2tT99kXYlxSNas"
+        "versionLogicalId": "TopicsRegisterLambdaVersionBHeGHdpfIsneXCApTh84Lp0zWDWGhzHLW0q1FwRk8"
       },
       "assistanceRegister": {
         "name": "func-AWSTallerDos-dev-assistanceRegister",
@@ -1526,7 +2617,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "AssistanceRegisterLambdaVersionwO8Ob75b3E8j1ZtjpsDWaSO73hCCNAJyEPV1ZD9RNE"
+        "versionLogicalId": "AssistanceRegisterLambdaVersionDv8fGb5OIY4fsGoC0KeKKoDZ3IXgIXsdL2sIN1XlA"
       },
       "auditory": {
         "name": "func-AWSTallerDos-dev-auditory",
@@ -1539,10 +2630,7 @@
           {
             "sqs": {
               "arn": {
-                "Fn::GetAtt": [
-                  "AuditoryQueue",
-                  "Arn"
-                ]
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"IamRoleLambdaExecution\"][\"Properties\"][\"Policies\"][0][\"PolicyDocument\"][\"Statement\"][2][\"Resource\"][0]"
               }
             }
           }
@@ -1554,7 +2642,164 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "AuditoryLambdaVersionoczqZxhlDIJh3zx3rjSN9ZNg47bITaIr0HupJcaJvHM"
+        "versionLogicalId": "AuditoryLambdaVersionZPbsV5Z2tgR4U9alCHwwbuovnJeOmOiKXAQja2kg83w"
+      },
+      "worker": {
+        "name": "func-AWSTallerDos-dev-worker",
+        "handler": "lambda/cross/workerControllerHandler.handler",
+        "environment": {
+          "TABLE_TOPICS": "ddb-AWSTallerDos-dev-TopicsTable",
+          "TABLE_AUDITORY": "ddb-AWSTallerDos-dev-AuditoryTable",
+          "REGION_DB": "us-west-1"
+        },
+        "role": "workerLambdaRole",
+        "events": [
+          {
+            "http": {
+              "path": "AWSTallerDos/dev/worker",
+              "method": "get",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "package": {
+          "artifact": ".serverless\\worker.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "WorkerLambdaVersionJOVcvqaZD3nju5A1FRumXoM9oLg1CQmdImFbgpFqSWc"
+      },
+      "getTopic": {
+        "name": "func-AWSTallerDos-dev-getTopic",
+        "handler": "lambda/cross/getTopicsControllerHandler.handler",
+        "environment": {
+          "TABLE_TOPICS": "ddb-AWSTallerDos-dev-TopicsTable",
+          "REGION_DB": "us-west-1"
+        },
+        "role": "getTopicLambdaRole",
+        "events": [
+          {
+            "http": {
+              "path": "AWSTallerDos/dev/getTopic",
+              "method": "get",
+              "authorizer": {
+                "name": "auth",
+                "arn": {
+                  "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"AuthLambdaPermissionApiGateway\"][\"Properties\"][\"FunctionName\"]"
+                },
+                "managedExternally": false,
+                "identitySource": "method.request.header.Authorization"
+              },
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "package": {
+          "artifact": ".serverless\\getTopic.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "GetTopicLambdaVersionIuEJMQWqe5e97zwMpAuMgVb0996i775yRLwYY98"
+      },
+      "getParams": {
+        "name": "func-AWSTallerDos-dev-getParams",
+        "handler": "lambda/cross/getParamsControllerHandler.handler",
+        "environment": {
+          "TABLE_PARAMS": "ddb-AWSTallerDos-dev-ParamsTable",
+          "REGION_DB": "us-west-1"
+        },
+        "role": "getParamsLambdaRole",
+        "events": [
+          {
+            "http": {
+              "path": "AWSTallerDos/dev/getParams",
+              "method": "get",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "package": {
+          "artifact": ".serverless\\getParams.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "GetParamsLambdaVersion8IDZ264j7FQszEBDiUJZfjiAK2RbESi8GD6EaysdJA"
+      },
+      "auth": {
+        "name": "func-AWSTallerDos-dev-auth",
+        "handler": "lambda/authorizer/AuthHandler.auth",
+        "events": [],
+        "package": {
+          "artifact": ".serverless\\auth.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs12.x",
+        "vpc": {},
+        "versionLogicalId": "AuthLambdaVersionUVGIdJEI3N5RaJSPFseH1hv5O5nAu7DgcY1s8iHI"
       }
     },
     "resources": {
@@ -1905,6 +3150,222 @@
             ]
           }
         },
+        "workerLambdaRole": {
+          "Type": "AWS::IAM::Role",
+          "Properties": {
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "lambda.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Description": "Lambda Role",
+            "ManagedPolicyArns": [
+              "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+            ],
+            "Path": "/",
+            "Policies": [
+              {
+                "PolicyName": "send-message-sqs-policy",
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "sqs:SendMessage"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::GetAtt": [
+                            "AuditoryQueue",
+                            "Arn"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "PolicyName": "write-dynamodb-policy",
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "dynamodb:PutItem",
+                        "dynamodb:GetRecords",
+                        "dynamodb:GetItem",
+                        "dynamodb:Scan",
+                        "dynamodb:Query",
+                        "dynamodb:PartiQLSelect",
+                        "dynamodb:UpdateItem"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::GetAtt": [
+                            "topicsTable",
+                            "Arn"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "RoleName": "iam-AWSTallerDos-dev-workerLambdaRole",
+            "Tags": [
+              {
+                "Key": "Name",
+                "Value": "iam-AWSTallerDos-dev-workerLambdaRole"
+              }
+            ]
+          }
+        },
+        "getTopicLambdaRole": {
+          "Type": "AWS::IAM::Role",
+          "Properties": {
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "lambda.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Description": "Lambda Role",
+            "ManagedPolicyArns": [
+              "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+            ],
+            "Path": "/",
+            "Policies": [
+              {
+                "PolicyName": "read-dynamodb-policy",
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "dynamodb:GetRecords",
+                        "dynamodb:GetItem",
+                        "dynamodb:Scan",
+                        "dynamodb:Query",
+                        "dynamodb:PartiQLSelect"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::GetAtt": [
+                            "topicsTable",
+                            "Arn"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "RoleName": "iam-AWSTallerDos-dev-getTopicLambdaRole",
+            "Tags": [
+              {
+                "Key": "Name",
+                "Value": "iam-AWSTallerDos-dev-getTopicLambdaRole"
+              }
+            ]
+          }
+        },
+        "getParamsLambdaRole": {
+          "Type": "AWS::IAM::Role",
+          "Properties": {
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "lambda.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Description": "Lambda Role",
+            "ManagedPolicyArns": [
+              "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+            ],
+            "Path": "/",
+            "Policies": [
+              {
+                "PolicyName": "read-dynamodb-policy",
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "dynamodb:GetRecords",
+                        "dynamodb:GetItem",
+                        "dynamodb:Scan",
+                        "dynamodb:Query",
+                        "dynamodb:PartiQLSelect"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::GetAtt": [
+                            "topicsTable",
+                            "Arn"
+                          ]
+                        },
+                        {
+                          "Fn::GetAtt": [
+                            "paramsTable",
+                            "Arn"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "RoleName": "iam-AWSTallerDos-dev-getParamsLambdaRole",
+            "Tags": [
+              {
+                "Key": "Name",
+                "Value": "iam-AWSTallerDos-dev-getParamsLambdaRole"
+              }
+            ]
+          }
+        },
         "AuditoryQueue": {
           "Type": "AWS::SQS::Queue",
           "Properties": {
@@ -1986,6 +3447,25 @@
             ],
             "BillingMode": "PAY_PER_REQUEST"
           }
+        },
+        "paramsTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "ddb-AWSTallerDos-dev-ParamsTable",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "typeParam",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "typeParam",
+                "KeyType": "HASH"
+              }
+            ],
+            "BillingMode": "PAY_PER_REQUEST"
+          }
         }
       },
       "Outputs": {}
@@ -2009,7 +3489,7 @@
       },
       "package": {
         "individually": true,
-        "artifactDirectoryName": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z"
+        "artifactDirectoryName": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z"
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
@@ -2023,7 +3503,7 @@
   },
   "package": {
     "individually": true,
-    "artifactDirectoryName": "serverless/AWSTallerDos/dev/1629295319604-2021-08-18T14:01:59.604Z",
+    "artifactDirectoryName": "serverless/AWSTallerDos/dev/1637190986634-2021-11-17T23:16:26.634Z",
     "artifact": ""
   }
 }

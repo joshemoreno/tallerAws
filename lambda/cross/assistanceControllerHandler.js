@@ -28,7 +28,7 @@ module.exports.handler = async (event, context) => {
         var statusTopic = await daoManager.searchById(context,tableTopics,'id',data.topic);
         util.insertLog("Resultdo Consulta Status People DB: " +  JSON.stringify(statusTopic));
         if (statusTopic!=null){
-          if (!statusTopic.status.toLowerCase()==='progreso'){ 
+          if (!statusTopic.topicStatus.toLowerCase()==='progreso'){ 
             util.insertLog("202-Solicitud rechazada: El tema no esta en progreso." + data);              
             return util.cargaClientResponse(202,"Solicitud rechazada: El tema no esta en progreso." , data);  
           }else{
